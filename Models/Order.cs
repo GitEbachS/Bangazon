@@ -9,6 +9,7 @@ public class Order
     public int CustomerId { get; set; }
     public string PaymentType { get; set; }
     public DateTime DateCreated { get; set; }
-    public string shipping { get; set; }
+    public string Shipping { get; set; }
+    public ICollection<Product> Products { get; set; }
     public bool IsClosed { get; set; }
 }
