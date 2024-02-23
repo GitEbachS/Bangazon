@@ -10,7 +10,9 @@ namespace Bangazon.Controllers
             //Get all products
             app.MapGet("/api/products", (BangazonDbContext db) =>
             {
-                return db.Products.ToList();
+                return db.Products
+                .Include(p => p.Seller)
+                .ToList();
             });
 
             //Get products via id
@@ -35,31 +37,6 @@ namespace Bangazon.Controllers
                 return Results.Ok(filteredSellerProd);
             });
 
-            /*app.MapPost("/api/products", async (BangazonDbContext _context, Product product) =>
-            {
-                Product newProduct = new()
-                {
-                    SellerId = 4,
-                    Name = "test",
-                    Description = "test",
-                    Price = 10.00M,
-                    Quantity = 1,
-                    CategoryId = 1,
-
-                };
-
-                if (Product.Orders?.Count > 0)
-                {
-                    foreach (var id in Product.Orders)
-                    {
-                        Order newOrder = await _context.Orders.FirstOrDefault(o => o.Id == id);
-                        newProduct.Orders.Add(newOrder);
-                    }
-                }
-                _context.Add(newProduct);
-                await _context.SaveChangesAsync();
-                return Results.Created($"/api/products/{product.Id}", product);
-            });*/
 
             app.MapGet("/api/productOrders/sellers/{id}", (BangazonDbContext db, int id) =>
             {

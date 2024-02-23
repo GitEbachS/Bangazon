@@ -24,44 +24,39 @@ namespace Bangazon.Controllers
                 return Results.Ok(singleOrder);
             });
 
-
-            /*app.MapPost("/api/orders", async (BangazonDbContext _context, Order order) =>
+            //get single order by customer id with the product details
+            app.MapGet("/api/productOrders/customers{id}", (BangazonDbContext db, int id) =>
             {
-                Order newOrder = new()
-                {
-                    CustomerId = 4,
-                    PaymentType = "Visa",
-                    DateCreated = DateTime.Now,
-                    Shipping = "FedEx",
-                    IsClosed = false,
-             
-
-                };
-
-                if (Order.Products?.Count > 0)
-                {
-                    foreach (var id in Order.Products)
-                    {
-                        Product newProduct = await _context.Products.FirstOrDefault(x => x.Id == id);
-                        newOrder.Products.Add(newProduct);
-                    }
-                }
-                _context.Add(newOrder);
-                await _context.SaveChangesAsync();
-                return Results.Created($"/api/orders/{order.Id}", order);
-            });*/
-
-            
-            app.MapGet("/api/orders/{id}", (BangazonDbContext db, int id) =>
-            {
-                var results = db.Orders.Include(c => c.Products).Where(c => c.Id == id);
-
-                if (results == null)
+                Order singleOrder = db.Orders.SingleOrDefault(x => x.CustomerId == id);
+                if (singleOrder == null)
                 {
                     return Results.NotFound();
                 }
-                return Results.Ok(results);
+                return Results.Ok(singleOrder);
             });
+
+            app.MapPost("/api/order/{id}/newProduct/{ProductId}", (BangazonDbContext db, int id, int ProductId) =>
+            {
+                var singleOrderToUpdate = db.Orders
+                .Include(o => o.Products)
+                .FirstOrDefault(o => o.Id == id);
+                var productToAdd = db.Products.FirstOrDefault(p => p.Id == ProductId);
+
+                try
+                {
+                    singleOrderToUpdate.Products.Add(productToAdd);
+                    db.SaveChanges();
+                    return Results.NoContent();
+
+                }
+                catch (DbUpdateException)
+                {
+                    return Results.BadRequest("Invalid data submitted");
+                }
+            });
+            
+
+
         }
     }
 }

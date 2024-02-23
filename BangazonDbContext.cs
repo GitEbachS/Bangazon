@@ -12,6 +12,11 @@ public class BangazonDbContext : DbContext
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
+        modelBuilder.Entity<Order>()
+            .HasMany(o => o.Products)
+            .WithMany(p => p.Orders);
+            
+
         // seed data with orders
         modelBuilder.Entity<Order>().HasData(new Order[]
         {
@@ -20,6 +25,12 @@ public class BangazonDbContext : DbContext
             new Order { Id = 3, CustomerId = 3, PaymentType = "Check", DateCreated = DateTime.Now, Shipping = "Prime", IsClosed = false },
             new Order { Id = 4, CustomerId = 4, PaymentType = "Visa", DateCreated = DateTime.Now, Shipping = "FedEx", IsClosed = false }
         });
+
+        modelBuilder.Entity<Product>()
+            .HasOne(p => p.Seller)
+            .WithMany(u => u.Products)
+            .HasForeignKey(p => p.SellerId);
+
 
         modelBuilder.Entity<Product>().HasData(new Product[]
        {
