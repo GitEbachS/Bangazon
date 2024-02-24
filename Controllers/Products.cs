@@ -18,38 +18,82 @@ namespace Bangazon.Controllers
             //Get products via id
             app.MapGet("/api/products/{id}", (BangazonDbContext db, int id) =>
             {
-                Product singleProduct = db.Products.SingleOrDefault(x => x.Id == id);
-                if (singleProduct == null)
+                Product singleProduct = db.Products
+                .Include(p => p.Seller)
+                .FirstOrDefault(s => s.Id == id);
+
+                try
                 {
-                    return Results.NotFound();
+                    return Results.Ok(singleProduct);
+
                 }
-                return Results.Ok(singleProduct);
+                catch (DbUpdateException)
+                {
+                    return Results.BadRequest("Invalid data submitted");
+                }
+                
             });
 
-            //Get products via seller id
-            app.MapGet("/api/products/seller/{id}", (BangazonDbContext db, int id) =>
-            {
-                List<Product> filteredSellerProd = db.Products.Where(p => p.SellerId == id).ToList();
-                if (filteredSellerProd == null)
+            //get seller's products that are in closed orders
+            app.MapGet("/api/sellerProducts/closedOrders/{sellerId}", (BangazonDbContext db, int sellerId) =>
                 {
-                    return Results.NotFound();
-                }
-                return Results.Ok(filteredSellerProd);
-            });
+                    var sellerProductsInAllOrders = db.Products
+                    .Include(p => p.Orders)
+                    .Where(p => p.SellerId == sellerId && p.Orders.Any(o => o.IsClosed))
+                    .ToList();
 
+                    return sellerProductsInAllOrders;
+                });
 
-            app.MapGet("/api/productOrders/sellers/{id}", (BangazonDbContext db, int id) =>
+            //get seller's products that are in closed or open orders
+            app.MapGet("/api/sellerProducts/allOrders/{sellerId}", (BangazonDbContext db, int sellerId) =>
             {
-                var results = db.Products.Include(o => o.Orders).Where(p => p.SellerId == id).ToList();
+                var sellerProductsInAllOrders = db.Products
+                .Include(p => p.Orders)
+                .Where(p => p.SellerId == sellerId && p.Orders.All(o => o.IsClosed))
+                .ToList();
+
+                return sellerProductsInAllOrders;
+            });
+            app.MapGet("/api/products/sellers/{sellerId}", (BangazonDbContext db, int sellerId) =>
+            {
+                var results = db.Users.Include(u => u.Products).Where(u => u.Id == sellerId).ToList();
                
 
 
-    if (results == null)
+                if (results == null)
                 {
                     return Results.NotFound();
                 }
                 return Results.Ok(results);
             });
+
+            app.MapGet("/api/products/categories/{sellerId}{categoryId}", (BangazonDbContext db, int sellerId, int categoryId) =>
+            {
+                var results = db.Products.Where(p => p.CategoryId == categoryId && p.SellerId == sellerId);
+
+
+
+                if (results == null)
+                {
+                    return Results.NotFound();
+                }
+                return Results.Ok(results);
+            });
+
+            app.MapGet("/api/twentyProducts", (BangazonDbContext db) =>
+            {
+                var results = db.Products.OrderByDescending(p => p.Id).Take(20).ToList();
+
+
+
+                if (results == null)
+                {
+                    return Results.NotFound();
+                }
+                return Results.Ok(results);
+            });
+
+
         }
-    }
 }
