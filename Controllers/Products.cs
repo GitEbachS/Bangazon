@@ -18,23 +18,20 @@ namespace Bangazon.Controllers
             //Get products via id
             app.MapGet("/api/products/{id}", (BangazonDbContext db, int id) =>
             {
-                Product singleProduct = db.Products.SingleOrDefault(x => x.Id == id);
-                if (singleProduct == null)
-                {
-                    return Results.NotFound();
-                }
-                return Results.Ok(singleProduct);
-            });
+                Product singleProduct = db.Products
+                .Include(p => p.Seller)
+                .FirstOrDefault(s => s.Id == id);
 
-            //Get products via seller id
-            app.MapGet("/api/products/seller/{id}", (BangazonDbContext db, int id) =>
-            {
-                List<Product> filteredSellerProd = db.Products.Where(p => p.SellerId == id).ToList();
-                if (filteredSellerProd == null)
+                try
                 {
-                    return Results.NotFound();
+                    return Results.Ok(singleProduct);
+
                 }
-                return Results.Ok(filteredSellerProd);
+                catch (DbUpdateException)
+                {
+                    return Results.BadRequest("Invalid data submitted");
+                }
+                
             });
 
 
