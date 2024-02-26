@@ -1,4 +1,5 @@
-﻿namespace Bangazon.DTOs
+﻿using System.ComponentModel.DataAnnotations;
+namespace Bangazon.DTOs
 {
     public class OrderUpdateDto
     {

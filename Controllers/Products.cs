@@ -31,7 +31,7 @@ namespace Bangazon.Controllers
                 {
                     return Results.BadRequest("Invalid data submitted");
                 }
-                
+
             });
 
             //get seller's products that are in closed orders
@@ -58,7 +58,7 @@ namespace Bangazon.Controllers
             app.MapGet("/api/products/sellers/{sellerId}", (BangazonDbContext db, int sellerId) =>
             {
                 var results = db.Users.Include(u => u.Products).Where(u => u.Id == sellerId).ToList();
-               
+
 
 
                 if (results == null)
@@ -68,7 +68,7 @@ namespace Bangazon.Controllers
                 return Results.Ok(results);
             });
 
-            app.MapGet("/api/products/categories/{sellerId}{categoryId}", (BangazonDbContext db, int sellerId, int categoryId) =>
+            app.MapGet("/api/products/categories/{sellerId}/{categoryId}", (BangazonDbContext db, int sellerId, int categoryId) =>
             {
                 var results = db.Products.Where(p => p.CategoryId == categoryId && p.SellerId == sellerId);
 
@@ -96,4 +96,5 @@ namespace Bangazon.Controllers
 
 
         }
+    }
 }
