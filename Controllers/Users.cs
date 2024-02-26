@@ -63,7 +63,7 @@ namespace Bangazon.Controllers
                 return Results.NoContent();
             });
 
-            app.MapGet("/api/checkUser/{uid}", (BangazonDbContext db, string uid) =>
+            app.MapPost("/api/checkUser/{uid}", (BangazonDbContext db, string uid) =>
             {
                 User checkUser = db.Users.FirstOrDefault(user => user.Uid == uid);
                 if (checkUser == null)
