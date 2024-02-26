@@ -39,6 +39,8 @@ public class BangazonDbContext : DbContext
             new Product { Id = 3, SellerId = 3, Name = "Curry Powder", Description = "Colorgul, fragrant, and sweet", Price = 12.00M, Quantity = 1660, CategoryId = 2 },
             new Product { Id = 4, SellerId = 4, Name = "Smoked Paprika", Description = "Smoky, dark tomato flaver, and slightly sweet", Price = 10.00M, Quantity = 1500, CategoryId = 4 },
        });
+
+       
         modelBuilder.Entity<Category>().HasData(new Category[]
        {
             new Category { Id = 1, Name = "Asian" },

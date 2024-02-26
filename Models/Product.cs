@@ -14,4 +14,5 @@ public class Product
     public int Quantity { get; set; }
     public ICollection<Order> Orders { get; set; }
     public int CategoryId { get; set; }
+    public Category Category { get; set; }
 }
