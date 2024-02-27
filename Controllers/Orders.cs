@@ -26,7 +26,7 @@ namespace Bangazon.Controllers
             });
 
             //get customer's open order with the product details
-            app.MapGet("/api/productOrders/customers{id}", (BangazonDbContext db, int id) =>
+            app.MapGet("/api/productOrders/customers/{id}", (BangazonDbContext db, int id) =>
             {
                 var allOrders = db.Orders
                 .Where(o => o.IsClosed == false)
@@ -41,7 +41,7 @@ namespace Bangazon.Controllers
             });
 
             //get cutomer's completed orders by customer id
-            app.MapGet("/api/openOrder/customers{id}", (BangazonDbContext db, int id) =>
+            app.MapGet("/api/openOrder/customers/{id}", (BangazonDbContext db, int id) =>
             {
                 return db.Orders
                 .Where(o => o.IsClosed == true)
@@ -103,12 +103,12 @@ namespace Bangazon.Controllers
             });
 
             //delete product from cart
-            app.MapDelete("/api/order/{id}/deleteProduct/{ProductId}", (BangazonDbContext db, int id, int ProductId) =>
+            app.MapDelete("/api/order/{orderId}/deleteProduct/{productId}", (BangazonDbContext db, int orderId, int productId) =>
             {
                 var singleOrderToUpdate = db.Orders
                 .Include(o => o.Products)
-                .FirstOrDefault(o => o.Id == id);
-                var productToDelete = db.Products.FirstOrDefault(p => p.Id == ProductId);
+                .FirstOrDefault(o => o.Id == orderId);
+                var productToDelete = db.Products.FirstOrDefault(p => p.Id == productId);
 
                 try
                 {
