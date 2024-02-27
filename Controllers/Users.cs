@@ -73,6 +73,15 @@ namespace Bangazon.Controllers
                 return Results.Ok(checkUser);
             });
 
+            app.MapGet("/api/sellers/search/{userInput}", (BangazonDbContext db, string userInput) =>
+            {
+                string searchTerm = userInput.ToLower();
+                var sellerList = db.Users.Include(s => s.Products).Where(u => u.IsSeller == true).ToList();
+                return sellerList
+                .Where(s => s.Name.ToLower().Contains(searchTerm) ||
+                s.Email.ToLower().Contains(searchTerm)).ToList();
+            });
+
         }
     }
 }

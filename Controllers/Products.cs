@@ -68,6 +68,7 @@ namespace Bangazon.Controllers
                 return Results.Ok(results);
             });
 
+            //get all of seller's products by category
             app.MapGet("/api/products/categories/{sellerId}/{categoryId}", (BangazonDbContext db, int sellerId, int categoryId) =>
             {
                 var results = db.Products.Where(p => p.CategoryId == categoryId && p.SellerId == sellerId);
@@ -94,6 +95,18 @@ namespace Bangazon.Controllers
                 return Results.Ok(results);
             });
 
+            app.MapGet("/api/products/search/{userInput}", (BangazonDbContext db, string userInput) =>
+            {
+                string searchTerm = userInput.ToLower();
+
+                return db.Products
+                .Include(p => p.Category)
+                .Include(p => p.Seller)
+                .Where(p => p.Name.ToLower().Contains(searchTerm) ||
+                p.Description.ToLower().Contains(searchTerm) ||
+                p.Category.Name.ToLower().Contains(searchTerm) ||
+                p.Seller.Name.ToLower().Contains(searchTerm)).ToList();
+            });
 
         }
     }
