@@ -29,10 +29,10 @@ namespace Bangazon.Controllers
             app.MapGet("/api/productOrders/customers/{id}", (BangazonDbContext db, int id) =>
             {
                 var allOrders = db.Orders
-                .Where(o => o.IsClosed == false)
                 .Include(o => o.Products)
                 .ThenInclude(p => p.Seller)
-                .SingleOrDefault(x => x.CustomerId == id);
+                .Where(o => o.IsClosed == false && o.CustomerId == id)
+                .ToList();
                 if (allOrders == null)
                 {
                     return Results.NotFound();
@@ -40,16 +40,18 @@ namespace Bangazon.Controllers
                 return Results.Ok(allOrders);
             });
 
-            //get cutomer's completed orders by customer id
-            app.MapGet("/api/openOrder/customers/{id}", (BangazonDbContext db, int id) =>
+            //get cutomer's completed orders with the details, by customer id
+            app.MapGet("/api/closedOrders/customers/{id}", (BangazonDbContext db, int id) =>
             {
                 return db.Orders
-                .Where(o => o.IsClosed == true)
                 .Include(o => o.Products)
-                .SingleOrDefault(x => x.CustomerId == id);
+                .ThenInclude(p => p.Seller)
+                .Where(o => o.IsClosed == true && o.CustomerId == id)
+                .ToList();
                
             });
 
+          
             //addOrder
             app.MapPost("/api/addOrder", (BangazonDbContext db, OrderDto orderObj) =>
             {

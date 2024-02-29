@@ -12,6 +12,8 @@ namespace Bangazon.Controllers
             {
                 return db.Products
                 .Include(p => p.Seller)
+                .Include(p => p.Orders)
+                .Include(p => p.Category)
                 .ToList();
             });
 
@@ -84,7 +86,10 @@ namespace Bangazon.Controllers
 
             app.MapGet("/api/twentyProducts", (BangazonDbContext db) =>
             {
-                var results = db.Products.OrderByDescending(p => p.Id).Take(20).ToList();
+                var results = db.Products
+                .Include(p => p.Category)
+                .Include(p => p.Seller)
+                .OrderByDescending(p => p.Id).Take(20).ToList();
 
 
 
