@@ -8,14 +8,6 @@ namespace Bangazon.Controllers
     {
         public static void Map(WebApplication app)
         {
-            //Get all orders
-            app.MapGet("/api/orders", (BangazonDbContext db) =>
-            {
-                return db.Orders
-                .Include(o => o.Products)
-                .ThenInclude(p => p.Seller)
-                .ToList();
-            });
 
             //Get orders via id
             app.MapGet("/api/orders/{id}", (BangazonDbContext db, int id) =>
@@ -36,7 +28,9 @@ namespace Bangazon.Controllers
             {
                 var allOrders = db.Orders
                 .Include(o => o.Products)
-                .ThenInclude(p => p.Seller)
+                     .ThenInclude(p => p.Seller)
+                .Include(o => o.Products)
+                     .ThenInclude(p => p.Category)
                 .SingleOrDefault(o => o.IsClosed == false && o.CustomerId == userId);
                 if (allOrders == null)
                 {
@@ -56,22 +50,7 @@ namespace Bangazon.Controllers
                
             });
 
-          
-            //addOrder
-            app.MapPost("/api/addOrder", (BangazonDbContext db, OrderDto orderObj) =>
-            {
-                Order addOrder = new()
-                {
-                    CustomerId = orderObj.CustomerId,
-                    PaymentType = orderObj.PaymentType,
-                    DateCreated = orderObj.DateCreated,
-                    Shipping = orderObj.Shipping,
-                };
-
-                db.Orders.Add(addOrder);
-                db.SaveChanges();
-                return Results.Created($"/api/addOrder/{addOrder.Id}", addOrder);
-            });
+         
 
             //an order is opened or checked for a current open order when the cutomer logs in
             app.MapPost("/api/cartOrder/new/{userId}", (BangazonDbContext db, int userId) =>
